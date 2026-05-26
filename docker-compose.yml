@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  attacker:
+    build:
+      context: .
+      dockerfile: Dockerfile.attacker
+    container_name: attacker_container
+    networks:
+      lan_network:
+        ipv4_address: 192.168.1.2
+      remote_network:
+        ipv4_address: 10.0.0.5
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    privileged: true
+
+  victim:
+    build:
+      context:
+        ipv4_address: 10.0.0.4
+
+  http_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.http
+    container_name: http_server_container
+    networks:
+      remote_network:
+        ipv4_address: 10.0.0.2
+    ports:
+      - "8080:80"
+
+  telnet_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.telnet
+    container_name: telnet_server_container
+    networks:
+      remote_network:
+        ipv4_address: 10.0.0.3
+    ports:
+      - "2323:23"
+
+networks:
+  lan_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+  remote_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24

@@ -1,0 +1,8 @@
+FROM debian:latest
+RUN apt-get update && apt-get install -y telnetd openbsd-inetd && \
+    echo "telnet stream tcp nowait root /usr/sbin/telnetd telnetd" >> /etc/inetd.conf && \
+    apt-get install -y passwd && \
+    useradd -m -s /bin/bash afzal && \
+    echo "afzal:2005021" | chpasswd && \
+    apt-get clean
+CMD ["inetd", "-d"]
